@@ -3,147 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA RJ v35 - BACKUP RECUPERADO</title>
+    <title>SISTEMA RJ v36 - ESTÁVEL</title>
     <style>
         :root { --primary: #2c3e50; --accent: #27ae60; --blue: #2980b9; --warning: #f39c12; --danger: #e74c3c; --bg: #ecf0f1; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
-        
         .tabs { display: flex; position: fixed; bottom: 0; width: 100%; background: var(--primary); z-index: 1000; }
         .tab-btn { flex: 1; padding: 18px; border: none; background: none; color: white; font-weight: bold; cursor: pointer; }
         .tab-btn.active { background: #34495e; border-top: 4px solid var(--accent); color: var(--accent); }
-        
         .page { display: none; padding: 15px; max-width: 500px; margin: auto; }
         .page.active { display: block; }
-
         .header-box { text-align: center; background: var(--primary); color: white; padding: 15px; border-radius: 0 0 20px 20px; }
         #relogio { font-size: 1.8rem; font-weight: bold; font-family: monospace; }
-        
         .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         h2 { font-size: 0.8rem; color: var(--primary); margin: 0 0 8px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; text-transform: uppercase; }
-        
         textarea { width: 100%; height: 70px; border: 1px solid #ccc; border-radius: 8px; padding: 8px; box-sizing: border-box; font-size: 1rem; background: #fafafa; }
-        .btn-main { width: 100%; padding: 12px; border-radius: 8px; border: none; margin-top: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; background: var(--accent); color: white; }
-
-        /* UTILITÁRIOS BACKUP */
+        .btn-main { width: 100%; padding: 14px; border-radius: 8px; border: none; margin-top: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; background: var(--accent); color: white; }
         .row-utils { display: flex; gap: 8px; margin-top: 15px; }
-        .btn-util { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white; font-weight: bold; font-size: 0.7rem; cursor: pointer; }
-
-        /* PALPITES POPULARES */
+        .btn-util { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ccc; background: white; font-weight: bold; font-size: 0.75rem; cursor: pointer; }
         .palpite-box { border-left: 5px solid var(--blue); padding: 10px; background: #f9f9f9; border-radius: 0 8px 8px 0; margin-bottom: 10px; }
-        .palpite-header { font-weight: bold; font-size: 1.1rem; color: #333; }
-        .milhar-linha { font-family: monospace; font-size: 1rem; color: #d32f2f; font-weight: bold; letter-spacing: 1px; margin-top: 5px; }
-
-        .list-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px; }
-        .list-table td { padding: 8px; border-bottom: 1px solid #eee; }
+        .milhar-linha { font-family: monospace; font-size: 1.1rem; color: #d32f2f; font-weight: bold; letter-spacing: 1px; margin-top: 5px; }
+        .list-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 10px; }
+        .list-table td { padding: 10px 5px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
 
 <div class="header-box">
     <div id="relogio">00:00:00</div>
-    <div id="display-cruz" style="font-size:0.9rem; color:var(--warning); margin-top:5px; font-weight:bold;">Cruz...</div>
+    <div id="display-cruz" style="font-size:0.9rem; color:var(--warning); margin-top:5px; font-weight:bold;">Calculando Cruz...</div>
 </div>
 
 <div id="aba-dados" class="page active">
-    <div class="card" style="margin-top:10px;">
-        <h2>📌 RANKING DE ATRASADOS</h2>
-        <textarea id="atrasados" placeholder="Ex: 1, 25, 14..."></textarea>
-        <button onclick="salvarRank()" class="btn-main" style="background:var(--primary)">SALVAR RANKING</button>
+    <div class="card">
+        <h2>📌 1. RANKING DE ATRASADOS</h2>
+        <textarea id="atrasados" placeholder="Digite os grupos atrasados aqui..."></textarea>
+        <button onclick="salvarRank()" class="btn-main" style="background:var(--primary)">SALVAR RANKING NO BANCO</button>
     </div>
 
     <div class="card">
-        <h2>🕒 LANÇAR RESULTADO</h2>
+        <h2>🕒 2. LANÇAR RESULTADO</h2>
         <div style="display: flex; gap: 5px;">
             <select id="horario" style="flex: 1.5; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
                 <option value="0">09:30</option><option value="1">11:30</option>
                 <option value="2">14:30</option><option value="3">16:30</option>
                 <option value="4">18:30</option><option value="5">21:30</option>
             </select>
-            <button onclick="lancar()" class="btn-main" style="margin-top:0; flex: 1;">LANÇAR</button>
+            <button onclick="lancarResultado()" class="btn-main" style="margin-top:0; flex: 1;">LANÇAR</button>
         </div>
-        <textarea id="res-input" placeholder="Cole o resultado aqui..." style="margin-top:8px;"></textarea>
+        <textarea id="res-input" placeholder="Cole o resultado ou as milhares aqui..." style="margin-top:10px;"></textarea>
         
         <table class="list-table"><tbody id="lista-lancamentos"></tbody></table>
-        
+
         <div class="row-utils">
-            <button class="btn-util" onclick="exportarBackup()">📤 EXPORTAR BACKUP</button>
-            <button class="btn-util" onclick="document.getElementById('fIn').click()">📥 RESTAURAR</button>
-            <input type="file" id="fIn" style="display:none" onchange="importarBackup(event)">
+            <button class="btn-util" onclick="fazerBackup()">📤 EXPORTAR BACKUP</button>
+            <button class="btn-util" onclick="document.getElementById('fInput').click()">📥 RESTAURAR</button>
+            <input type="file" id="fInput" style="display:none" onchange="restaurarBackup(event)">
         </div>
-        <button onclick="resetar()" style="width:100%; margin-top:15px; color:var(--danger); background:none; border:none; font-size:0.7rem; font-weight:bold; cursor:pointer;">LIMPAR TUDO (RESETAR DIA)</button>
+        <button onclick="limparTudo()" style="width:100%; margin-top:15px; color:var(--danger); border:none; background:none; font-size:0.7rem; font-weight:bold; cursor:pointer;">LIMPAR DADOS DE HOJE</button>
     </div>
 </div>
 
 <div id="aba-palpites" class="page">
     <div class="card">
-        <h2>⚙️ GERAR SUGESTÕES</h2>
-        <select id="nivel-risco" style="width:100%; padding:12px; border-radius:8px; border: 1px solid #ccc;">
-            <option value="equilibrado">EQUILIBRADO (Misto)</option>
-            <option value="conservador">CONSERVADOR (Foco Atraso)</option>
-            <option value="arriscado">ARRISCADO (Frequência)</option>
+        <h2>⚙️ CONFIGURAR CÁLCULO</h2>
+        <select id="nivel-risco" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc;">
+            <option value="equilibrado">EQUILIBRADO</option>
+            <option value="conservador">CONSERVADOR</option>
+            <option value="arriscado">ARRISCADO</option>
         </select>
-        <button onclick="gerarPalpites()" class="btn-main" style="margin-top:10px;">🎯 GERAR 6 BICHOS + MILHARES</button>
+        <button onclick="gerarPalpites()" class="btn-main" style="margin-top:10px;">🎯 GERAR 6 GRUPOS + MILHARES</button>
     </div>
     <div id="container-palpites"></div>
 </div>
 
 <nav class="tabs">
-    <button class="tab-btn active" onclick="showPage('aba-dados', this)">DADOS</button>
-    <button class="tab-btn" onclick="showPage('aba-palpites', this)">PALPITES</button>
+    <button class="tab-btn active" onclick="trocarAba('aba-dados', this)">DADOS</button>
+    <button class="tab-btn" onclick="trocarAba('aba-palpites', this)">PALPITES</button>
 </nav>
 
 <script>
     const ANIMAIS = ["Avestruz","Águia","Burro","Borboleta","Cachorro","Cabra","Carneiro","Camelo","Cobra","Coelho","Cavalo","Elefante","Galo","Gato","Jacaré","Leão","Macaco","Porco","Pavão","Peru","Touro","Tigre","Urso","Veado","Vaca"];
     let cruzGlobal = [];
 
-    function timer() { document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); }
-
-    function calcCruz() {
-        const dia = new Date().getDate();
-        cruzGlobal = [(dia+3)%10, (dia+6)%10, (dia+9)%10, (dia+12)%10];
-        document.getElementById('display-cruz').innerText = `CRUZ DO DIA: ${cruzGlobal.join(' - ')}`;
+    // --- FUNÇÕES DE SISTEMA ---
+    function salvarRank() {
+        let val = document.getElementById('atrasados').value;
+        let r = (val.match(/\d+/g) || []).map(Number).filter(n => n >= 1 && n <= 25);
+        localStorage.setItem('SISTEMA_RJ_RANK', JSON.stringify([...new Set(r)]));
+        alert("Ranking Salvo com Sucesso!");
+        document.getElementById('atrasados').value = "";
     }
 
-    function fmt(n) { return n.toString().padStart(2, '0'); }
+    function lancarResultado() {
+        let txt = document.getElementById('res-input').value;
+        let matches = txt.match(/\b\d{3,4}\b/g) || [];
+        let grupos = matches.map(m => {
+            let dezena = parseInt(m.slice(-2));
+            return Math.ceil((dezena === 0 ? 100 : dezena) / 4);
+        }).filter(g => g >= 1 && g <= 25).slice(0, 5);
 
-    // BACKUP FUNCIONAL
-    function exportarBackup() {
-        const d = { 
-            rank: localStorage.getItem('rj_v34_rank'), 
-            dados: localStorage.getItem('rj_v34_data') 
-        };
-        const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `backup_rj_v35_${new Date().getTime()}.json`;
+        if(grupos.length === 0) return alert("Erro: Cole os números do resultado.");
+
+        let data = JSON.parse(localStorage.getItem('SISTEMA_RJ_DATA') || "[]");
+        let h = ["09:30", "11:30", "14:30", "16:30", "18:30", "21:30"];
+        let sel = document.getElementById('horario');
+        
+        data.push({ hora: h[sel.value], g: grupos });
+        localStorage.setItem('SISTEMA_RJ_DATA', JSON.stringify(data));
+        
+        document.getElementById('res-input').value = "";
+        sel.value = (parseInt(sel.value) + 1) % 6;
+        renderizar();
+    }
+
+    function renderizar() {
+        let data = JSON.parse(localStorage.getItem('SISTEMA_RJ_DATA') || "[]");
+        document.getElementById('lista-lancamentos').innerHTML = data.map((item, i) => `
+            <tr><td><b>${item.hora}</b></td><td>${item.g.map(n => n.toString().padStart(2,'0')).join('-')}</td>
+            <td style="text-align:right"><button onclick="removerItem(${i})" style="color:red; border:none; background:none; cursor:pointer;">❌</button></td></tr>
+        `).join('');
+    }
+
+    function removerItem(i) {
+        let d = JSON.parse(localStorage.getItem('SISTEMA_RJ_DATA'));
+        d.splice(i, 1);
+        localStorage.setItem('SISTEMA_RJ_DATA', JSON.stringify(d));
+        renderizar();
+    }
+
+    function limparTudo() {
+        if(confirm("Apagar todos os dados lançados hoje?")) {
+            localStorage.removeItem('SISTEMA_RJ_DATA');
+            renderizar();
+        }
+    }
+
+    // --- BACKUP ---
+    function fazerBackup() {
+        let obj = { r: localStorage.getItem('SISTEMA_RJ_RANK'), d: localStorage.getItem('SISTEMA_RJ_DATA') };
+        let blob = new Blob([JSON.stringify(obj)], {type: 'application/json'});
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `backup_rj_v36.json`;
         a.click();
-        URL.revokeObjectURL(url);
     }
 
-    function importarBackup(e) {
-        const reader = new FileReader();
+    function restaurarBackup(e) {
+        let reader = new FileReader();
         reader.onload = (f) => {
-            try {
-                const d = JSON.parse(f.target.result);
-                if(d.rank) localStorage.setItem('rj_v34_rank', d.rank);
-                if(d.dados) localStorage.setItem('rj_v34_data', d.dados);
-                alert("Backup restaurado com sucesso!");
-                location.reload();
-            } catch(err) { alert("Arquivo de backup inválido."); }
+            let json = JSON.parse(f.target.result);
+            if(json.r) localStorage.setItem('SISTEMA_RJ_RANK', json.r);
+            if(json.d) localStorage.setItem('SISTEMA_RJ_DATA', json.d);
+            alert("Restaurado com Sucesso!");
+            location.reload();
         };
         reader.readAsText(e.target.files[0]);
     }
 
-    function gerarMilhares(grupo) {
+    // --- PALPITES ---
+    function gerarMilhares(g) {
+        let base = (g - 1) * 4 + 1;
         let dezenas = [];
-        let base = (grupo - 1) * 4 + 1;
         for(let i=0; i<4; i++) {
-            let num = base + i;
-            if(num === 101) num = 0;
-            dezenas.push(fmt(num));
+            let d = base + i;
+            dezenas.push((d === 101 ? "00" : d.toString().padStart(2, '0')));
         }
         return dezenas.map(d => (Math.floor(Math.random() * 90) + 10).toString() + d).join(' - ');
     }
 
-    function extrair
+    function gerarPalpites() {
+        let rank = JSON.parse(localStorage.getItem('SISTEMA_RJ_RANK') || "[]");
+        let sairam = JSON.parse(localStorage.getItem('SISTEMA_RJ_DATA') || "[]").flatMap(x => x.g);
+        let risco = document.getElementById('nivel-risco').value;
+        
+        let gCruz = [];
+        for(let i=1; i<=25; i++) if(cruzGlobal.includes(i % 10)) gCruz.push(i);
+        gCruz.sort((a,b) => (rank.indexOf(a) !== -1 ? -1 : 1));
+        let top3Cruz = gCruz.slice(0, 3);
+
+        let freq = {}; sairam.forEach(x => freq[x] = (freq[x] || 0) + 1);
+        let scores = [];
+        for(let i=1; i<=25; i++) {
+            if(top3Cruz.includes(i)) continue;
+            let p = 0;
+            let posAtr = rank.indexOf(i);
+            if(posAtr !== -1) p += (25 - posAtr) * (risco === 'conservador' ? 40 : 20);
+            if(freq[i]) p += freq[i] * (risco === 'arriscado' ? 50 : 25);
+            scores.push({ i, p });
+        }
+        let top3Ciclo = scores.sort((a,b) => b.p - a.p).slice(0, 3).map(x => x.i);
+
+        let html = "";
+        [...top3Cruz, ...top3Ciclo].forEach((g, idx) => {
+            let label = idx < 3 ? "CRUZ" : "CICLO";
+            let cor = idx < 3 ? "var(--warning)" : "var(--blue)";
+            html += `<div class="palpite-box" style="border-left-color:${cor}">
+                <div style="font-weight:bold">${ANIMAIS[g-1]} <span style="color:#666">G-${g.toString().padStart(2,'0')}</span> 
+                <span style="font-size:0.6rem; background:#eee; padding:2px 4px; float:right">${label}</span></div>
+                <div class="milhar-linha">${gerarMilhares(g)}</div>
+            </div>`;
+        });
+        document.getElementById('container-palpites').innerHTML = html || "<p style='text-align:center; padding:20px;'>Preencha o ranking e lance dados para gerar.</p>";
+    }
+
+    // --- INTERFACE ---
+    function trocarAba(id, btn) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    function atualizarInfos() {
+        let agora = new Date();
+        document.getElementById('relogio').innerText = agora.toLocaleTimeString('pt-BR');
+        let dia = agora.getDate();
+        cruzGlobal = [(dia+3)%10, (dia+6)%10, (dia+9)%10, (dia+12)%10];
+        document.getElementById('display-cruz').innerText = `CRUZ DO DIA: ${cruzGlobal.join(' - ')}`;
+    }
+
+    window.onload = () => {
+        atualizarInfos();
+        renderizar();
+        setInterval(atualizarInfos, 1000);
+    };
+</script>
+</body>
+</html>
