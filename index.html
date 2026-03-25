@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA RJ v34 - PALPITE COMPLETO</title>
+    <title>SISTEMA RJ v35 - BACKUP RECUPERADO</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #27ae60; --blue: #2980b9; --warning: #f39c12; --bg: #ecf0f1; }
+        :root { --primary: #2c3e50; --accent: #27ae60; --blue: #2980b9; --warning: #f39c12; --danger: #e74c3c; --bg: #ecf0f1; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
         
         .tabs { display: flex; position: fixed; bottom: 0; width: 100%; background: var(--primary); z-index: 1000; }
@@ -24,14 +24,17 @@
         textarea { width: 100%; height: 70px; border: 1px solid #ccc; border-radius: 8px; padding: 8px; box-sizing: border-box; font-size: 1rem; background: #fafafa; }
         .btn-main { width: 100%; padding: 12px; border-radius: 8px; border: none; margin-top: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; background: var(--accent); color: white; }
 
-        /* ESTILO POPULAR DOS PALPITES */
-        .palpite-box { border-left: 5px solid var(--blue); padding: 10px; background: #f9f9f9; border-radius: 0 8px 8px 0; margin-bottom: 10px; }
-        .palpite-header { font-weight: bold; font-size: 1.1rem; color: #333; margin-bottom: 5px; }
-        .milhar-linha { font-family: monospace; font-size: 1rem; color: #d32f2f; font-weight: bold; letter-spacing: 1px; }
-        .label-origem { font-size: 0.6rem; background: #ddd; padding: 2px 5px; border-radius: 3px; vertical-align: middle; }
+        /* UTILITÁRIOS BACKUP */
+        .row-utils { display: flex; gap: 8px; margin-top: 15px; }
+        .btn-util { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white; font-weight: bold; font-size: 0.7rem; cursor: pointer; }
 
-        .list-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        .list-table td { padding: 5px; border-bottom: 1px solid #eee; }
+        /* PALPITES POPULARES */
+        .palpite-box { border-left: 5px solid var(--blue); padding: 10px; background: #f9f9f9; border-radius: 0 8px 8px 0; margin-bottom: 10px; }
+        .palpite-header { font-weight: bold; font-size: 1.1rem; color: #333; }
+        .milhar-linha { font-family: monospace; font-size: 1rem; color: #d32f2f; font-weight: bold; letter-spacing: 1px; margin-top: 5px; }
+
+        .list-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px; }
+        .list-table td { padding: 8px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -43,7 +46,7 @@
 
 <div id="aba-dados" class="page active">
     <div class="card" style="margin-top:10px;">
-        <h2>📌 RANKING ATRASADOS</h2>
+        <h2>📌 RANKING DE ATRASADOS</h2>
         <textarea id="atrasados" placeholder="Ex: 1, 25, 14..."></textarea>
         <button onclick="salvarRank()" class="btn-main" style="background:var(--primary)">SALVAR RANKING</button>
     </div>
@@ -51,30 +54,33 @@
     <div class="card">
         <h2>🕒 LANÇAR RESULTADO</h2>
         <div style="display: flex; gap: 5px;">
-            <select id="horario" style="flex: 1.5; padding: 10px; border-radius: 8px;">
+            <select id="horario" style="flex: 1.5; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
                 <option value="0">09:30</option><option value="1">11:30</option>
                 <option value="2">14:30</option><option value="3">16:30</option>
                 <option value="4">18:30</option><option value="5">21:30</option>
             </select>
             <button onclick="lancar()" class="btn-main" style="margin-top:0; flex: 1;">LANÇAR</button>
         </div>
-        <textarea id="res-input" placeholder="Cole as milhares aqui..." style="margin-top:8px;"></textarea>
-        <table class="list-table" style="margin-top:10px;"><tbody id="lista-lancamentos"></tbody></table>
+        <textarea id="res-input" placeholder="Cole o resultado aqui..." style="margin-top:8px;"></textarea>
         
-        <div style="display:flex; gap:5px; margin-top:10px;">
-            <button onclick="exportarBackup()" style="flex:1; font-size:0.7rem;">BACKUP</button>
-            <button onclick="resetar()" style="flex:1; font-size:0.7rem; color:red;">LIMPAR</button>
+        <table class="list-table"><tbody id="lista-lancamentos"></tbody></table>
+        
+        <div class="row-utils">
+            <button class="btn-util" onclick="exportarBackup()">📤 EXPORTAR BACKUP</button>
+            <button class="btn-util" onclick="document.getElementById('fIn').click()">📥 RESTAURAR</button>
+            <input type="file" id="fIn" style="display:none" onchange="importarBackup(event)">
         </div>
+        <button onclick="resetar()" style="width:100%; margin-top:15px; color:var(--danger); background:none; border:none; font-size:0.7rem; font-weight:bold; cursor:pointer;">LIMPAR TUDO (RESETAR DIA)</button>
     </div>
 </div>
 
 <div id="aba-palpites" class="page">
     <div class="card">
         <h2>⚙️ GERAR SUGESTÕES</h2>
-        <select id="nivel-risco" style="width:100%; padding:10px; border-radius:8px;">
-            <option value="equilibrado">EQUILIBRADO</option>
-            <option value="conservador">CONSERVADOR</option>
-            <option value="arriscado">ARRISCADO</option>
+        <select id="nivel-risco" style="width:100%; padding:12px; border-radius:8px; border: 1px solid #ccc;">
+            <option value="equilibrado">EQUILIBRADO (Misto)</option>
+            <option value="conservador">CONSERVADOR (Foco Atraso)</option>
+            <option value="arriscado">ARRISCADO (Frequência)</option>
         </select>
         <button onclick="gerarPalpites()" class="btn-main" style="margin-top:10px;">🎯 GERAR 6 BICHOS + MILHARES</button>
     </div>
@@ -100,109 +106,44 @@
 
     function fmt(n) { return n.toString().padStart(2, '0'); }
 
-    // Geração de Milhares Automática baseada no Grupo
+    // BACKUP FUNCIONAL
+    function exportarBackup() {
+        const d = { 
+            rank: localStorage.getItem('rj_v34_rank'), 
+            dados: localStorage.getItem('rj_v34_data') 
+        };
+        const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `backup_rj_v35_${new Date().getTime()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importarBackup(e) {
+        const reader = new FileReader();
+        reader.onload = (f) => {
+            try {
+                const d = JSON.parse(f.target.result);
+                if(d.rank) localStorage.setItem('rj_v34_rank', d.rank);
+                if(d.dados) localStorage.setItem('rj_v34_data', d.dados);
+                alert("Backup restaurado com sucesso!");
+                location.reload();
+            } catch(err) { alert("Arquivo de backup inválido."); }
+        };
+        reader.readAsText(e.target.files[0]);
+    }
+
     function gerarMilhares(grupo) {
         let dezenas = [];
         let base = (grupo - 1) * 4 + 1;
-        for(let i=0; i<4; i++) dezenas.push(fmt(base + i === 101 ? 0 : base + i)); // Ajuste da Vaca (00)
-        
-        return dezenas.map(d => {
-            let mil = Math.floor(Math.random() * 90) + 10; // Prefixo aleatório
-            return mil.toString() + d;
-        }).join(' - ');
-    }
-
-    function extrairGrupos(texto) {
-        let matches = texto.match(/\b\d{3,4}\b/g) || [];
-        return matches.map(m => {
-            let dezena = parseInt(m.slice(-2));
-            return Math.ceil((dezena === 0 ? 100 : dezena) / 4);
-        }).filter(g => g >= 1 && g <= 25);
-    }
-
-    function lancar() {
-        const sel = document.getElementById('horario');
-        const input = document.getElementById('res-input');
-        let grupos = extrairGrupos(input.value).slice(0, 5);
-        if(!grupos.length) return alert("Insira resultados.");
-        let banco = JSON.parse(localStorage.getItem('rj_v34_data') || "[]");
-        const h = ["09:30", "11:30", "14:30", "16:30", "18:30", "21:30"];
-        banco.push({ hora: h[sel.value], grps: grupos });
-        localStorage.setItem('rj_v34_data', JSON.stringify(banco));
-        input.value = ""; sel.value = (parseInt(sel.value) + 1) % 6;
-        renderizar();
-    }
-
-    function renderizar() {
-        let banco = JSON.parse(localStorage.getItem('rj_v34_data') || "[]");
-        document.getElementById('lista-lancamentos').innerHTML = banco.map((item, i) => `
-            <tr><td><b>${item.hora}</b></td><td>${item.grps.map(fmt).join('-')}</td><td><button onclick="remover(${i})" style="border:none;background:none;">❌</button></td></tr>
-        `).join('');
-    }
-
-    function gerarPalpites() {
-        const rank = JSON.parse(localStorage.getItem('rj_v34_rank') || "[]");
-        const sairam = JSON.parse(localStorage.getItem('rj_v34_data') || "[]").flatMap(x => x.grps);
-        const risco = document.getElementById('nivel-risco').value;
-        
-        // Separação por origem
-        let grpsCruz = [];
-        for(let i=1; i<=25; i++) if(cruzGlobal.includes(i % 10)) grpsCruz.push(i);
-        grpsCruz.sort((a, b) => (rank.indexOf(a) !== -1 ? -1 : 1));
-        let top3Cruz = grpsCruz.slice(0, 3);
-
-        let freq = {}; sairam.forEach(g => freq[g] = (freq[g] || 0) + 1);
-        let scoresCiclo = [];
-        for(let i=1; i<=25; i++) {
-            if(top3Cruz.includes(i)) continue;
-            let p = 0;
-            let posAtr = rank.indexOf(i);
-            let pAtr = (risco === 'conservador') ? 40 : 20;
-            if(posAtr !== -1) p += (25 - posAtr) * pAtr;
-            if(freq[i]) p += (freq[i] * 30);
-            scoresCiclo.push({ i, p });
+        for(let i=0; i<4; i++) {
+            let num = base + i;
+            if(num === 101) num = 0;
+            dezenas.push(fmt(num));
         }
-        let top3Ciclo = scoresCiclo.sort((a,b) => b.p - a.p).slice(0, 3).map(x => x.i);
-
-        const cont = document.getElementById('container-palpites');
-        let html = "";
-        
-        // Renderiza os 6 Palpites (3 da Cruz + 3 do Ciclo)
-        [...top3Cruz, ...top3Ciclo].forEach((g, index) => {
-            let origem = index < 3 ? "CRUZ" : "CICLO";
-            let cor = index < 3 ? "var(--warning)" : "var(--blue)";
-            html += `
-                <div class="palpite-box" style="border-left-color:${cor}">
-                    <div class="palpite-header">
-                        ${ANIMAIS[g-1]} <span style="color:#666">G-${fmt(g)}</span> 
-                        <span class="label-origem">${origem}</span>
-                    </div>
-                    <div class="milhar-linha">${gerarMilhares(g)}</div>
-                </div>`;
-        });
-        cont.innerHTML = html;
+        return dezenas.map(d => (Math.floor(Math.random() * 90) + 10).toString() + d).join(' - ');
     }
 
-    function showPage(id, btn) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active'); btn.classList.add('active');
-    }
-
-    function salvarRank() {
-        let r = (document.getElementById('atrasados').value.match(/\d+/g) || []).map(Number).filter(n => n <= 25);
-        localStorage.setItem('rj_v34_rank', JSON.stringify([...new Set(r)]));
-        document.getElementById('atrasados').value = ""; alert("Ranking salvo!");
-    }
-
-    function remover(i) {
-        let d = JSON.parse(localStorage.getItem('rj_v34_data'));
-        d.splice(i, 1); localStorage.setItem('rj_v34_data', JSON.stringify(d)); renderizar();
-    }
-
-    function resetar() { if(confirm("Limpar tudo?")) { localStorage.removeItem('rj_v34_data'); renderizar(); } }
-
-    window.onload = () => { calcCruz(); renderizar(); setInterval(timer, 1000); };
-</script>
-</body>
-</html>
+    function extrair
